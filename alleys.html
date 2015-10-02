@@ -7,7 +7,7 @@
     <title>WBEZ Curious City</title>
 
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="poverty.css">
+    <link rel="stylesheet" type="text/css" href="map.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -73,6 +73,7 @@
           <span><a href='#' class='next btn btn-default' id='next'><span class="glyphicon glyphicon-chevron-right"></span></a></span>
           <!-- <span><a href='#add' class='last btn btn-default' id='last'>2010</a></span> -->
         </div>
+        <button onclick="togglePoints();">toggle some data!</button>
       </div>
         <div class='my-legend legend-scale pct aa'>
             <span class="legend-title">Plurality of tract, 40% of group below federal poverty line</span>
@@ -99,14 +100,15 @@
 
     <script>
     $(document).ready(function(){
-
+      var geojson;
+      var toggle = false;
       var map = L.map('map',{ zoomControl: false }).setView([41.8947, -87.6105],10);
       new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
       L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}.png').addTo(map);
 
       // *** SET ALL THE DESIGN OPTIONS FOR THE ALLEYS HERE ***
       $.getJSON("chicagoalleys.json", function(data) {
-          var geojson = L.geoJson(data, {
+          geojson = L.geoJson(data, {
           style: function (feature) {
               return {
                 weight: 0.5, // set line width
@@ -115,15 +117,30 @@
                 };
               }
           }).addTo(map);
+
+          var overlayMaps = {
+              "Alleys": geojson
+          };
+
+          L.control.layers(overlayMaps).addTo(map);
         });
 
-    });
+      $('.close').click(function(){
+        $('.overlay-content').toggle();
+        $('.fa.fa-chevron-up').toggle();
+        $('.fa.fa-chevron-down').toggle();
+        $('.moreInfo').toggle();
+      });
 
-    $('.close').click(function(){
-      $('.overlay-content').toggle();
-      $('.fa.fa-chevron-up').toggle();
-      $('.fa.fa-chevron-down').toggle();
-      $('.moreInfo').toggle();
+      window.togglePoints = function() {
+        if(!toggle) {
+          map.removeLayer(geojson);
+        } else {
+          map.addLayer(geojson);
+        }
+        toggle = !toggle;
+      }
+
     });
     </script>
 
